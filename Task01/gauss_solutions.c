@@ -111,7 +111,7 @@ double measure_time(enum solution_type type, int size)
             exit(1);
         }
 
-        memcpy(matrix_A_copy, matrix_A, size);
+        memcpy(matrix_A_copy, matrix_A, size * size);
         memcpy(vector_b_copy, vector_b, size);
         
         start = clock();
