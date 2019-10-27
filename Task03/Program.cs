@@ -111,7 +111,7 @@ namespace Task03
 
                 if (Data<T>.consCounter % 2 == 0)
                 {
-                    Console.WriteLine("Consumers are leeping for 1 second..");
+                    Console.WriteLine("Consumers are sleeping for 1 second..");
                     Thread.Sleep(1000);
                 }
 
