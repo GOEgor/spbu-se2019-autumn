@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -11,15 +11,15 @@ namespace Task04
     {
         static void Main(string[] args)
         {
-            Task.Run(() => MainAsync(args));
+            string inputUrl = Console.ReadLine();
+
+            Task.Run(() => MainAsync(inputUrl));
 
             Console.ReadLine();
         }
 
-        static async Task MainAsync(string[] args)
+        static async Task MainAsync(string inputUrl)
         {
-            string inputUrl = Console.ReadLine();
-
             var listOfLinkedUrls = await GetLinkedUrlsAsync(inputUrl);
             if (listOfLinkedUrls == null)
             {
