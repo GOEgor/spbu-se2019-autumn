@@ -100,9 +100,6 @@ namespace Task03
         {
             while (_isRunning)
             {
-                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} " +
-                   $"is waiting for semaphore because buffer is empty.");
-
                 Data<T>.Sem.Wait();
 
                 Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} " +
