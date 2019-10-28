@@ -13,7 +13,7 @@ namespace Task04
         {
             string inputUrl = Console.ReadLine();
 
-            Task.Run(() => MainAsync(inputUrl));
+            MainAsync(inputUrl);
 
             Console.ReadLine();
         }
@@ -21,7 +21,7 @@ namespace Task04
         static async Task MainAsync(string inputUrl)
         {
             var listOfLinkedUrls = await GetLinkedUrlsAsync(inputUrl);
-            if (listOfLinkedUrls == null)
+            if (listOfLinkedUrls.Count == 0)
             {
                 Console.WriteLine($"Input URL {inputUrl} could not load " +
                     $"or it doesn't have any linked URLs.");
@@ -41,23 +41,19 @@ namespace Task04
         {
             string source = await ReadUrlAsync(url);
 
-            if (source == null)
-            {
-                return null;
-            }
-            else
-            {
-                var listOfLinks = new List<string>();
+            var listOfLinks = new List<string>();
 
+            if (source != null)
+            {
                 MatchCollection matches = Regex.Matches(source, @"href=""http(\S*)""");
                 if (matches.Count > 0)
                 {
                     foreach (Match match in matches)
                         listOfLinks.Add(ExtractLink(match.Value));
                 }
-
-                return listOfLinks;
             }
+
+            return listOfLinks;
         }
 
         private static async Task<string> ReadUrlAsync(string url)
