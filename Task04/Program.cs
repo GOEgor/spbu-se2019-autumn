@@ -28,13 +28,18 @@ namespace Task04
                 return;
             }
 
+            List<Task<int>> tasks = new List<Task<int>>();         
             foreach (var url in listOfLinkedUrls)
-            {
-                int size = await GetUrlSizeAsync(url);
-                DisplaySize(url, size);
-            }
+                tasks.Add(ProcessUrlAsync(url));
 
-            Console.WriteLine("All links checked.");
+            await Task.WhenAll(tasks);
+        }
+
+        private static async Task<int> ProcessUrlAsync(string url)
+        {
+            int size = await GetUrlSizeAsync(url);
+            DisplaySize(url, size);
+            return size;
         }
 
         private static async Task<List<string>> GetLinkedUrlsAsync(string url)
@@ -42,10 +47,9 @@ namespace Task04
             string source = await ReadUrlAsync(url);
 
             var listOfLinks = new List<string>();
-
             if (source != null)
             {
-                MatchCollection matches = Regex.Matches(source, @"href=""http(\S*)""");
+                MatchCollection matches = Regex.Matches(source, @"<a href=""http(\S*)""");
                 if (matches.Count > 0)
                 {
                     foreach (Match match in matches)
@@ -59,7 +63,6 @@ namespace Task04
         private static async Task<string> ReadUrlAsync(string url)
         {
             string urlContent = null;
-
             WebRequest req = WebRequest.Create(url);
             req.Method = "GET";
 
@@ -84,10 +87,8 @@ namespace Task04
         private static async Task<int> GetUrlSizeAsync(string url)
         {
             string urlContent = await ReadUrlAsync(url);
-
             if (urlContent == null)
                 return -1;
-
             return urlContent.Length;
         }
 
@@ -103,11 +104,10 @@ namespace Task04
             }
         }
 
-        private static string ExtractLink(string match)
+        private static string ExtractLink(string s)
         {
-            int subFrom = match.IndexOf("\"") + 1;
-            int subTo = match.LastIndexOf("\"");
-            return match.Substring(subFrom, subTo - subFrom);
+            var match = Regex.Match(s, @"http(\S*)""");
+            return match.Value.TrimEnd('\"');
         }
     }
 }
