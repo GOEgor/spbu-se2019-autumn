@@ -13,12 +13,23 @@ namespace Task04
         {
             string inputUrl = Console.ReadLine();
 
-            MainAsync(inputUrl);
+            var handler = new UrlHandler(inputUrl);
+            handler.HandleAsync().GetAwaiter().GetResult();
 
             Console.ReadLine();
         }
+    }
 
-        static async Task MainAsync(string inputUrl)
+    class UrlHandler
+    {
+        private readonly string inputUrl;
+
+        public UrlHandler(string url)
+        {
+            inputUrl = url;
+        }
+
+        public async Task HandleAsync()
         {
             var listOfLinkedUrls = await GetLinkedUrlsAsync(inputUrl);
             if (listOfLinkedUrls.Count == 0)
@@ -35,14 +46,15 @@ namespace Task04
             await Task.WhenAll(tasks);
         }
 
-        private static async Task<int> ProcessUrlAsync(string url)
+        private async Task<int> ProcessUrlAsync(string url)
         {
-            int size = await GetUrlSizeAsync(url);
+            string urlContent = await ReadUrlAsync(url);
+            int size = urlContent?.Length ?? -1;
             DisplaySize(url, size);
             return size;
         }
 
-        private static async Task<List<string>> GetLinkedUrlsAsync(string url)
+        private async Task<List<string>> GetLinkedUrlsAsync(string url)
         {
             string source = await ReadUrlAsync(url);
 
@@ -60,7 +72,7 @@ namespace Task04
             return listOfLinks;
         }
 
-        private static async Task<string> ReadUrlAsync(string url)
+        private async Task<string> ReadUrlAsync(string url)
         {
             string urlContent = null;
             WebRequest req = WebRequest.Create(url);
@@ -78,33 +90,19 @@ namespace Task04
             }
             catch (WebException)
             {
-                //keep urlContent null
+                Console.WriteLine($"Error while loading {url}.");
             }
 
             return urlContent;
         }
 
-        private static async Task<int> GetUrlSizeAsync(string url)
+        private void DisplaySize(string url, int size)
         {
-            string urlContent = await ReadUrlAsync(url);
-            if (urlContent == null)
-                return -1;
-            return urlContent.Length;
+            string message = size == -1 ? $"{url} couldn't be loaded." : $"{url} has {size} symbols.";
+            Console.WriteLine(message);
         }
 
-        private static void DisplaySize(string url, int size)
-        {
-            if (size == -1)
-            {
-                Console.WriteLine($"{url} couldn't be loaded.");
-            }
-            else
-            {
-                Console.WriteLine($"{url} has {size} symbols.");
-            }
-        }
-
-        private static string ExtractLink(string s)
+        private string ExtractLink(string s)
         {
             var match = Regex.Match(s, @"http(\S*)""");
             return match.Value.TrimEnd('\"');
