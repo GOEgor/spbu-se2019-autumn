@@ -36,7 +36,8 @@ namespace Task03
             foreach (var producer in producers) { producer.StopRunning(); }
             foreach (var consumer in consumers) { consumer.StopRunning(); }
 
-            Console.ReadLine();
+            for (int i = 0; i < NumOfConsumers; i++)
+                Data<int>.Sem.Release();
         }
     }
 
@@ -45,8 +46,6 @@ namespace Task03
         public static List<T> Buff = new List<T>();
         public static Mutex Mtx = new Mutex();
         public static SemaphoreSlim Sem = new SemaphoreSlim(0, Program.SemCapacity);
-        public static int ProdCounter = 0;
-        public static int ConsCounter = 0;
     }
 
     class Producer<T> where T : new()
@@ -66,17 +65,18 @@ namespace Task03
                     $"is waiting for mutex to produce some data.");
                 Data<T>.Mtx.WaitOne();
 
+                if (!_isRunning)
+                {
+                    Data<T>.Mtx.ReleaseMutex();
+                    break;
+                }
+
                 Data<T>.Buff.Add(new T());
 
-                Data<T>.ProdCounter++;
                 Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} " +
-                    $"has produced data ({Data<T>.ProdCounter} times total).");
+                    $"has produced data.");
 
-                if (Data<T>.ProdCounter % 2 == 0)
-                {
-                    Console.WriteLine("Producers are sleeping for 1 second..");
-                    Thread.Sleep(1000);
-                }
+                Thread.Sleep(500);
 
                 Data<T>.Mtx.ReleaseMutex();
                 Data<T>.Sem.Release();
@@ -103,24 +103,21 @@ namespace Task03
                 if (Data<T>.Sem.CurrentCount == 0)
                     Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} " +
                         $"is waiting for semaphore because buffer is empty.");
-                        
+
                 Data<T>.Sem.Wait();
+
+                if (!_isRunning) break;
 
                 Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} " +
                    $"is waiting for mutex to consume some data.");
 
                 Data<T>.Mtx.WaitOne();
                 Data<T>.Buff.RemoveAt(Data<T>.Buff.Count - 1);
-                Data<T>.ConsCounter++;
 
                 Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} " +
-                    $"has consumed data ({Data<T>.ConsCounter} times total).");
+                    $"has consumed data.");
 
-                if (Data<T>.ConsCounter % 2 == 0)
-                {
-                    Console.WriteLine("Consumers are sleeping for 1 second..");
-                    Thread.Sleep(1000);
-                }
+                Thread.Sleep(500);
 
                 Data<T>.Mtx.ReleaseMutex();
             }
