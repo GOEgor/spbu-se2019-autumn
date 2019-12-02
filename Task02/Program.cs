@@ -17,8 +17,6 @@ namespace Task02
             var matrix = graph.GenerateMatrixArr(file);
             var edgesArr = graph.GenerateEdgesArr(file);
 
-            Console.WriteLine();
-
             var floydSeq = FloydAlgorithm.SolveSeq(matrix, vertices);
             var primSeq = PrimAlgorithm.SolveSeq(matrix, vertices);
             var kruskalSeq = KruskalAlgorithm.SolveSeq(edgesArr, vertices);
