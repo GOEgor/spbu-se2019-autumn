@@ -6,7 +6,7 @@ using Task05;
 
 namespace Tests
 {
-    public class FineTestsPar
+    public class CoarseTestsPar
     {
         [Test]
         public void Test()

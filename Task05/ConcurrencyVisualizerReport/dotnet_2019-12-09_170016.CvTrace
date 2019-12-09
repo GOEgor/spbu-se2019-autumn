@@ -39,15 +39,15 @@
       <MyCodeDirectory>C:\Program Files\dotnet</MyCodeDirectory>
     </JustMyCode>
   </Config>
-  <Pid>51996</Pid>
+  <Pid>50300</Pid>
   <EtwSourceFileNames>
-    <EtwSourceFile>dotnet_2019-12-09_163213.kernel.etl</EtwSourceFile>
-    <EtwSourceFile>dotnet_2019-12-09_163213.user.etl</EtwSourceFile>
+    <EtwSourceFile>dotnet_2019-12-09_170016.kernel.etl</EtwSourceFile>
+    <EtwSourceFile>dotnet_2019-12-09_170016.user.etl</EtwSourceFile>
   </EtwSourceFileNames>
   <DataManagerSources>
     <DataManagerSource>
-      <Pid>51996</Pid>
-      <DataManagerSourceFile>dotnet_2019-12-09_163213.p51996.CvData</DataManagerSourceFile>
+      <Pid>50300</Pid>
+      <DataManagerSourceFile>dotnet_2019-12-09_170016.p50300.CvData</DataManagerSourceFile>
     </DataManagerSource>
   </DataManagerSources>
   <NtToDosMaps>
