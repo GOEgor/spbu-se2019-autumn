@@ -63,13 +63,13 @@ void bitonic_sort_gpu(int *arr, unsigned int exp)
 	gpuErrCheck(cudaMalloc(&d_arr, arr_size));
 	gpuErrCheck(cudaMemcpy(d_arr, arr, arr_size, cudaMemcpyHostToDevice));
 
-	dim3 num_blocks = arr_len / NUM_THREADS;
-	dim3 num_threads = NUM_THREADS;
+	int num_blocks = arr_len / NUM_THREADS;
+    int num_threads = NUM_THREADS;
 
 	if (arr_len / NUM_THREADS == 0) 
 	{
-		num_threads = 1;
 		num_blocks = arr_len;
+		num_threads = 1;
 	}
 
 	for (int seq = 2; seq <= arr_len; seq <<= 1)

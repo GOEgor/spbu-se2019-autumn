@@ -6,7 +6,7 @@
 #include "bitonic_sorts.cuh"
 
 #define TIME_TESTS 5
-#define MAX_RAND 10000
+#define MAX_RAND 1000000
 #define MAX_EXP 25
 
 void generate_arr(int *arr, int n)
@@ -30,8 +30,6 @@ void verify(int *arr, int n)
 
 int main()
 {
-	cudaFree(0);
-
 	for (unsigned int exp = 1; exp <= MAX_EXP; exp++)
 	{
 		int len = 1 << exp;
@@ -82,11 +80,6 @@ int main()
 		verify(test_arr, len);
 
 		free(test_arr);
-	}
-
-	if (cudaDeviceReset() != cudaSuccess) {
-		printf("cudaDeviceReset failed!");
-		exit(1);
 	}
 
 	return 0;
