@@ -39,24 +39,34 @@ namespace Task05
             return true;
         }
 
+        public void DisposeMutex()
+        {
+            _mutex.Close();
+        }
+
         public bool Find(int value)
         {
             _mutex.WaitOne();
             Node curr = _root;
 
-            while (curr != null)
+            try
             {
-                if (curr.Value == value)
+                while (curr != null)
                 {
-                    _mutex.ReleaseMutex();
-                    return true;
+                    if (curr.Value == value)
+                    {
+                        return true;
+                    }
+
+                    curr = curr.Value > value ? curr.Left : curr.Right;
                 }
 
-                curr = curr.Value > value ? curr.Left : curr.Right;
+                return false;
             }
-
-            _mutex.ReleaseMutex();
-            return false;
+            finally
+            {
+                _mutex.ReleaseMutex();
+            }
         }
 
         public void Insert(int value)
@@ -64,39 +74,42 @@ namespace Task05
             _mutex.WaitOne();
             Node curr = _root;
 
-            while (curr != null)
+            try
             {
-                if (curr.Value == value)
+                while (curr != null)
                 {
-                    _mutex.ReleaseMutex();
-                    return;
-                }
-                else if (curr.Value > value)
-                {
-                    if (curr.Left == null)
+                    if (curr.Value == value)
                     {
-                        curr.Left = new Node(value, curr);
-                        _mutex.ReleaseMutex();
                         return;
                     }
-
-                    curr = curr.Left;
-                }
-                else
-                {
-                    if (curr.Right == null)
+                    else if (curr.Value > value)
                     {
-                        curr.Right = new Node(value, curr);
-                        _mutex.ReleaseMutex();
-                        return;
-                    }
+                        if (curr.Left == null)
+                        {
+                            curr.Left = new Node(value, curr);
+                            return;
+                        }
 
-                    curr = curr.Right;
+                        curr = curr.Left;
+                    }
+                    else
+                    {
+                        if (curr.Right == null)
+                        {
+                            curr.Right = new Node(value, curr);
+                            return;
+                        }
+
+                        curr = curr.Right;
+                    }
                 }
+
+                _root = new Node(value, null);
             }
-
-            _root = new Node(value, null);
-            _mutex.ReleaseMutex();
+            finally
+            {
+                _mutex.ReleaseMutex();
+            }
         }
     }
 }

@@ -4,25 +4,40 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Task05;
 using System.Threading;
+using System.Diagnostics;
 
 namespace Tests
 {
     public class CoarseTestsPar
     {
-        [Test]
-        public void TestTaskParallelism()
+        private List<int> insertList = new List<int>();
+        private List<int> findList = new List<int>();
+        private CoarseGrainedBSTree tree = new CoarseGrainedBSTree();
+        private Random random = new Random();
+
+        [SetUp]
+        public void SetUp()
         {
-            List<int> insertList = new List<int>();
-            List<int> findList = new List<int>();
-            var tree = new CoarseGrainedBSTree();
-            var tasks = new List<Task>();
+            for (int i = 0; i < 1000; i++)
+                tree.Insert(random.Next(0, 100));
 
             for (var i = 0; i < 100; i++)
             {
-                var random = new Random();
-                insertList.Add(random.Next(0, 50));
+                insertList.Add(random.Next(0, 100));
                 findList.Add(random.Next(0, 100));
             }
+        }
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            tree.DisposeMutex();
+        }
+
+        [Test]
+        public void CheckMutexAfterInsertAndFind_RandomTreeWithTaskParallelism_True()
+        {
+            var tasks = new List<Task>();
 
             foreach (var value in insertList)
                 tasks.Add(Task.Run(() => tree.Insert(value)));
@@ -34,34 +49,21 @@ namespace Tests
             Assert.True(tree.CheckMutex());
         }
 
-        [Test]
-        public void Test20ThreadsParallelism()
+        [DatapointSource]
+        public int[] values = new int[] { 1, 5, 10, 20, 50, 100, 200 };
+
+        [Theory]
+        public void CheckMutexAfterInsert_RandomTreeWithThreadParallelism_True(int threadsAmount)
         {
-            List<int> insertList = new List<int>();
-            List<int> findList = new List<int>();
-            var tree = new CoarseGrainedBSTree();
-            var random = new Random();
-
-            for (var i = 0; i < 10; i++)
-            {
-                insertList.Add(random.Next(0, 100000));
-                findList.Add(random.Next(0, 1000));
-            }
-
-            for (int i = 0; i < 100000; i++)
-                tree.Insert(random.Next(0, 100000));
-
-            Thread[] threads = new Thread[20];
+            Thread[] threads = new Thread[threadsAmount];
             int threadCnt = 0;
 
-            foreach (var value in insertList)
-                threads[threadCnt++] = new Thread(() => {
-                    tree.Insert(value);
-                });
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
 
-            foreach (var value in findList)
+            for (int i = 0; i < threadsAmount; i++)
                 threads[threadCnt++] = new Thread(() => {
-                    tree.Find(value);
+                    tree.Insert(insertList[i]);
                 });
 
             foreach (var thread in threads)
@@ -69,6 +71,35 @@ namespace Tests
 
             foreach (var thread in threads)
                 thread.Join();
+
+            sw.Stop();
+            Console.WriteLine("Elapsed={0}", sw.Elapsed);
+
+            Assert.True(tree.CheckMutex());
+        }
+
+        [Theory]
+        public void CheckMutexAfterFind_RandomTreeWithThreadParallelism_True(int threadsAmount)
+        {
+            Thread[] threads = new Thread[threadsAmount];
+            int threadCnt = 0;
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            for (int i = 0; i < threadsAmount; i++)
+                threads[threadCnt++] = new Thread(() => {
+                    tree.Find(findList[i]);
+                });
+
+            foreach (var thread in threads)
+                thread.Start();
+
+            foreach (var thread in threads)
+                thread.Join();
+
+            sw.Stop();
+            Console.WriteLine("Elapsed={0}", sw.Elapsed);
 
             Assert.True(tree.CheckMutex());
         }

@@ -51,6 +51,21 @@ namespace Task05
             return true;
         }
 
+        public void DisposeMutex()
+        {
+            traverseAndDisposeMutex(_root);
+        }
+
+        private void traverseAndDisposeMutex(Node node)
+        {
+            if (node != null)
+            {
+                node.mutex.Close();
+                traverseAndDisposeMutex(node.Left);
+                traverseAndDisposeMutex(node.Right);
+            }
+        }
+
         public bool Find(int value)
         {
             Node curr = _root;
@@ -60,35 +75,37 @@ namespace Task05
 
             curr.mutex.WaitOne();
 
-            while (true)
+            try
             {
-                if (curr.Value == value)
+                while (true)
                 {
+                    if (curr.Value == value)
+                    {
+                        return true;
+                    }
+
+                    Node next = curr.Value > value ? curr.Left : curr.Right;
+
+                    if (next == null)
+                        break;
+
                     if (curr.Parent != null)
                         curr.Parent.mutex.ReleaseMutex();
 
-                    curr.mutex.ReleaseMutex();
-                    return true;
+                    next.mutex.WaitOne();
+
+                    curr = next;
                 }
 
-                Node next = curr.Value > value ? curr.Left : curr.Right;
-
-                if (next == null)
-                    break;
-
+                return false;
+            }
+            finally
+            {
                 if (curr.Parent != null)
                     curr.Parent.mutex.ReleaseMutex();
 
-                next.mutex.WaitOne();
-
-                curr = next;
+                curr.mutex.ReleaseMutex();
             }
-
-            if (curr.Parent != null)
-                curr.Parent.mutex.ReleaseMutex();
-
-            curr.mutex.ReleaseMutex();
-            return false;
         }
 
         public void Insert(int value)
@@ -103,54 +120,50 @@ namespace Task05
 
             curr.mutex.WaitOne();
 
-            while (true)
+            try
             {
-                if (curr.Value == value)
+                while (true)
                 {
-                    if (curr.Parent != null)
-                        curr.Parent.mutex.ReleaseMutex();
-
-                    curr.mutex.ReleaseMutex();
-                    return;
-                }
-                else if (curr.Value > value)
-                {
-                    if (curr.Left == null)
+                    if (curr.Value == value)
                     {
-                        curr.Left = new Node(value, curr);
+                        return;
+                    }
+                    else if (curr.Value > value)
+                    {
+                        if (curr.Left == null)
+                        {
+                            curr.Left = new Node(value, curr);
+                            return;
+                        }
 
                         if (curr.Parent != null)
                             curr.Parent.mutex.ReleaseMutex();
 
-                        curr.mutex.ReleaseMutex();
-                        return;
+                        curr.Left.mutex.WaitOne();
+                        curr = curr.Left;
                     }
-
-                    if (curr.Parent != null)
-                        curr.Parent.mutex.ReleaseMutex();
-
-                    curr.Left.mutex.WaitOne();
-                    curr = curr.Left;
-                }
-                else
-                {
-                    if (curr.Right == null)
+                    else
                     {
-                        curr.Right = new Node(value, curr);
+                        if (curr.Right == null)
+                        {
+                            curr.Right = new Node(value, curr);
+                            return;
+                        }
 
                         if (curr.Parent != null)
                             curr.Parent.mutex.ReleaseMutex();
 
-                        curr.mutex.ReleaseMutex();
-                        return;
+                        curr.Right.mutex.WaitOne();
+                        curr = curr.Right;
                     }
-
-                    if (curr.Parent != null)
-                        curr.Parent.mutex.ReleaseMutex();
-
-                    curr.Right.mutex.WaitOne();
-                    curr = curr.Right;
                 }
+            }
+            finally
+            {
+                if (curr.Parent != null)
+                    curr.Parent.mutex.ReleaseMutex();
+
+                curr.mutex.ReleaseMutex();
             }
         }
     }
