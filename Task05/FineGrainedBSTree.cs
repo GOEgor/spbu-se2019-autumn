@@ -28,7 +28,6 @@ namespace Task05
         }
 
         private Node _root;
-        private Mutex _mutex = new Mutex();
 
         public bool CheckMutex()
         {
