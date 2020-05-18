@@ -1,3 +1,3 @@
 # spbu-se2019-autumn
 
-One branch for task
+One branch per one task.
