@@ -1,0 +1,36 @@
+All solutions are correct.
+Solutions were tested 10 times.
+Average time with size 50 of sequential solution: 0.000000
+Average time with size 50 of parallel solution: 0.000000
+Average time with size 50 of GSL solution: 0.000000
+
+All solutions are correct.
+Solutions were tested 10 times.
+Average time with size 100 of sequential solution: 0.001500
+Average time with size 100 of parallel solution: 0.001600
+Average time with size 100 of GSL solution: 0.000000
+
+All solutions are correct.
+Solutions were tested 10 times.
+Average time with size 500 of sequential solution: 0.121900
+Average time with size 500 of parallel solution: 0.131200
+Average time with size 500 of GSL solution: 0.025000
+
+All solutions are correct.
+Solutions were tested 10 times.
+Average time with size 1000 of sequential solution: 0.968700
+Average time with size 1000 of parallel solution: 0.973500
+Average time with size 1000 of GSL solution: 0.220300
+
+All solutions are correct.
+Solutions were tested 10 times.
+Average time with size 2000 of sequential solution: 7.726500
+Average time with size 2000 of parallel solution: 7.909400
+Average time with size 2000 of GSL solution: 1.936000
+
+All solutions are correct.
+Solutions were tested 10 times.
+Average time with size 3000 of sequential solution: 25.989100
+Average time with size 3000 of parallel solution: 26.737400
+Average time with size 3000 of GSL solution: 6.701600
+
