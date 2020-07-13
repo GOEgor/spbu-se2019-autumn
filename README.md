@@ -1,3 +1,3 @@
 # spbu-se2019-autumn
 
-One branch per one task.
+Parrallel programming course mainly using C#
